@@ -16,7 +16,6 @@ import android.view.*
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
-import com.github.chrisbanes.photoview.BuildConfig.VERSION_NAME
 import kotlinx.coroutines.*
 import org.linphone.BaseApplication.Companion.corePreferences
 import org.linphone.R

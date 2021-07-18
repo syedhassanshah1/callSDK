@@ -11,7 +11,6 @@ import org.linphone.R
 import org.linphone.activities.GenericActivity
 import org.linphone.activities.launcher.dataModels.CallParametersModel
 import com.callsdk.builder.CallSDKBuilder
-import org.linphone.activities.main.MainActivity
 import org.linphone.activities.main.viewmodels.SharedMainViewModel
 import org.linphone.core.*
 import org.linphone.core.tools.Log
@@ -135,20 +134,6 @@ class LauncherActivity : GenericActivity() {
             return
         }
 
-
-        val intent: Intent = Intent()
-        intent.setClass(this, MainActivity::class.java)
-
-        // Propagate current intent action, type and data
-        if (getIntent() != null) {
-            val extras = getIntent().extras
-            if (extras != null) intent.putExtras(extras)
-        }
-        intent.action = getIntent().action
-        intent.type = getIntent().type
-        intent.data = getIntent().data
-
-//        startActivity(intent)
         if (corePreferences.enableAnimations) {
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }

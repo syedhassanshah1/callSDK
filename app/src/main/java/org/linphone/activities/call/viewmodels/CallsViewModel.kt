@@ -19,7 +19,9 @@ class CallsViewModel : ViewModel() {
     val noMoreCallEvent: MutableLiveData<Event<Boolean>> by lazy {
         MutableLiveData<Event<Boolean>>()
     }
-
+    val callEndedEvent: MutableLiveData<Event<Boolean>> by lazy {
+        MutableLiveData<Event<Boolean>>()
+    }
     val callUpdateEvent: MutableLiveData<Event<Call>> by lazy {
         MutableLiveData<Event<Call>>()
     }
@@ -42,6 +44,7 @@ class CallsViewModel : ViewModel() {
             }
 
             if (state == Call.State.End || state == Call.State.Released || state == Call.State.Error) {
+                callEndedEvent.value = Event(true)
                 if (core.callsNb == 0) {
                     noMoreCallEvent.value = Event(true)
                 } else {

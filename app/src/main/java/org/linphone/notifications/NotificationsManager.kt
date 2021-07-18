@@ -16,14 +16,12 @@ import androidx.core.app.RemoteInput
 import androidx.core.content.ContextCompat
 import androidx.core.content.LocusIdCompat
 import androidx.core.graphics.drawable.IconCompat
-import androidx.navigation.NavDeepLinkBuilder
 import org.linphone.BaseApplication.Companion.coreContext
 import org.linphone.BaseApplication.Companion.corePreferences
 import org.linphone.R
 import org.linphone.activities.call.CallActivity
 import org.linphone.activities.call.IncomingCallActivity
 import org.linphone.activities.call.OutgoingCallActivity
-import org.linphone.activities.main.MainActivity
 import org.linphone.compatibility.Compatibility
 import org.linphone.contact.Contact
 import org.linphone.core.*
@@ -103,7 +101,7 @@ class NotificationsManager(private val context: Context) {
                 Call.State.End, Call.State.Error -> dismissCallNotification(call)
                 Call.State.Released -> {
                     if (LinphoneUtils.isCallLogMissed(call.callLog)) {
-                        displayMissedCallNotification(call)
+//                        displayMissedCallNotification(call)
                     }
                 }
                 else -> displayCallNotification(call)
@@ -387,47 +385,6 @@ class NotificationsManager(private val context: Context) {
         }
     }
 
-    fun displayMissedCallNotification(call: Call) {
-        val missedCallCount: Int = call.core.missedCallsCount
-        val body: String
-        if (missedCallCount > 1) {
-            body = context.getString(R.string.missed_calls_notification_body)
-                    .format(missedCallCount)
-            Log.i("[Notifications Manager] Updating missed calls notification count to $missedCallCount")
-        } else {
-            val contact: Contact? = coreContext.contactsManager.findContactByAddress(call.remoteAddress)
-            body = context.getString(R.string.missed_call_notification_body)
-                    .format(contact?.fullName ?: LinphoneUtils.getDisplayName(call.remoteAddress))
-            Log.i("[Notifications Manager] Creating missed call notification")
-        }
-
-        val pendingIntent = NavDeepLinkBuilder(context)
-                .setComponentName(MainActivity::class.java)
-//                .setGraph(R.navigation.main_nav_graph)
-//                .setDestination(R.id.masterCallLogsFragment)
-                .createPendingIntent()
-
-        val builder = NotificationCompat.Builder(
-                context, context.getString(R.string.notification_channel_missed_call_id))
-                .setContentTitle(context.getString(R.string.missed_call_notification_title))
-                .setContentText(body)
-                .setSmallIcon(R.drawable.topbar_missed_call_notification)
-                .setAutoCancel(true)
-                // .setCategory(NotificationCompat.CATEGORY_EVENT) No one really matches "missed call"
-                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
-                .setWhen(System.currentTimeMillis())
-                .setShowWhen(true)
-                .setNumber(missedCallCount)
-                .setColor(ContextCompat.getColor(context, R.color.notification_led_color))
-
-        if (!corePreferences.preventInterfaceFromShowingUp) {
-            builder.setContentIntent(pendingIntent)
-        }
-
-        val notification = builder.build()
-
-        notify(MISSED_CALLS_NOTIF_ID, notification)
-    }
 
     fun dismissMissedCallNotification() {
         cancel(MISSED_CALLS_NOTIF_ID)
@@ -522,12 +479,6 @@ class NotificationsManager(private val context: Context) {
         args.putString("RemoteSipUri", peerAddress)
         args.putString("LocalSipUri", localAddress)
 
-        val pendingIntent = NavDeepLinkBuilder(context)
-                .setComponentName(MainActivity::class.java)
-//                .setGraph(R.navigation.main_nav_graph)
-//                .setDestination(R.id.masterChatRoomsFragment)
-                .setArguments(args)
-                .createPendingIntent()
 
 //        val target = Intent(context, ChatBubbleActivity::class.java)
 //        target.putExtra("RemoteSipUri", peerAddress)
@@ -582,7 +533,7 @@ class NotificationsManager(private val context: Context) {
             notifiable.groupTitle = room.subject
         }
 
-        displayChatNotifiable(room, notifiable)
+//        displayChatNotifiable(room, notifiable)
     }
 
     private fun getNotifiableForRoom(room: ChatRoom): Notifiable {
@@ -613,7 +564,7 @@ class NotificationsManager(private val context: Context) {
         )
         notifiable.messages.add(reply)
 
-        displayChatNotifiable(message.chatRoom, notifiable)
+//        displayChatNotifiable(message.chatRoom, notifiable)
     }
 
     fun dismissChatNotification(room: ChatRoom) {

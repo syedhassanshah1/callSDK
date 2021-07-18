@@ -7,7 +7,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ServiceHelper<RESULT>(
-    val listener: (response: RESULT?, error: CallParametersModel?, isSuccess: Boolean) -> Unit
+        val listener: (response: RESULT?, error: CallParametersModel?, isSuccess: Boolean) -> Unit
 ) {
 
     fun enqueueCall(call: Call<RESULT>, tag: String) {
@@ -16,11 +16,15 @@ class ServiceHelper<RESULT>(
                 if (response.isSuccessful) {
                     listener.invoke(response.body(), null, response.isSuccessful)
                 } else {
-                    val responseWrapper = Gson().fromJson(
-                            response.errorBody()?.string(),
-                            CallParametersModel::class.java
-                    )
-                    listener.invoke(null, responseWrapper, response.isSuccessful)
+                    try {
+                        val responseWrapper = Gson().fromJson(
+                                response.errorBody()?.string(),
+                                CallParametersModel::class.java
+                        )
+                        listener.invoke(null, responseWrapper, response.isSuccessful)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
             }
 

@@ -29,14 +29,6 @@ class CallActivity : ProximitySensorActivity() {
     private var previewX: Float = 0f
     private var previewY: Float = 0f
     private lateinit var videoZoomHelper: VideoZoomHelper
-    private val proximitySensor by lazy {
-        val powerManager = getSystemService<PowerManager>() ?: return@lazy null
-        if (powerManager.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
-            powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, CallActivity::class.java.simpleName).also {
-                it.setReferenceCounted(false)
-            }
-        } else null
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

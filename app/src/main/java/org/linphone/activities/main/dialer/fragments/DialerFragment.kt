@@ -14,7 +14,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.linphone.BaseApplication.Companion.coreContext
 import org.linphone.BaseApplication.Companion.corePreferences
 import org.linphone.R
-import org.linphone.activities.main.MainActivity
 import org.linphone.activities.main.dialer.fragments.SecureFragment
 import org.linphone.activities.main.dialer.viewmodels.DialerViewModel
 import org.linphone.activities.main.viewmodels.DialogViewModel
@@ -89,10 +88,10 @@ class DialerFragment : SecureFragment<DialerFragmentBinding>() {
                     val clip = ClipData.newPlainText("Logs url", url)
                     clipboard.setPrimaryClip(clip)
 
-                    val activity = requireActivity() as MainActivity
-                    activity.showSnackBar(R.string.logs_url_copied_to_clipboard)
+//                    val activity = requireActivity() as MainActivity
+//                    activity.showSnackBar(R.string.logs_url_copied_to_clipboard)
 
-                    AppUtils.shareUploadedLogsUrl(activity, url)
+//                    AppUtils.shareUploadedLogsUrl(activity, url)
                 }
             }
         })

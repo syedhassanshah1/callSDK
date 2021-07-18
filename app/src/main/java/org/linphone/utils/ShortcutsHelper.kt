@@ -14,7 +14,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.graphics.drawable.IconCompat
 import org.linphone.BaseApplication.Companion.coreContext
 import org.linphone.R
-import org.linphone.activities.main.MainActivity
+import org.linphone.activities.launcher.TestActivity
 import org.linphone.contact.Contact
 import org.linphone.contact.NativeContact
 import org.linphone.core.Address
@@ -88,7 +88,7 @@ class ShortcutsHelper(val context: Context) {
                 val icon = person.icon
 
                 val intent = Intent(Intent.ACTION_MAIN)
-                intent.setClass(context, MainActivity::class.java)
+                intent.setClass(context, TestActivity::class.java)
                 intent.putExtra("ContactId", contact.nativeId)
 
                 return ShortcutInfoCompat.Builder(context, contact.nativeId)
@@ -179,7 +179,7 @@ class ShortcutsHelper(val context: Context) {
                 args.putString("LocalSipUri", localAddress)
 
                 val intent = Intent(Intent.ACTION_MAIN)
-                intent.setClass(context, MainActivity::class.java)
+                intent.setClass(context, TestActivity::class.java)
                 intent.putExtra("Chat", true)
                 intent.putExtra("RemoteSipUri", peerAddress)
                 intent.putExtra("LocalSipUri", localAddress)

@@ -1,26 +1,26 @@
-
 package org.linphone.activities.call.fragments
 
 import android.Manifest
 import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.app.Dialog
-import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
+import android.os.PowerManager
 import android.os.SystemClock
 import android.view.View
+import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.flexbox.FlexboxLayout
 import org.linphone.BaseApplication.Companion.coreContext
 import org.linphone.BaseApplication.Companion.corePreferences
 import org.linphone.R
 import org.linphone.activities.GenericFragment
+import org.linphone.activities.call.CallActivity
 import org.linphone.activities.call.viewmodels.CallsViewModel
 import org.linphone.activities.call.viewmodels.ConferenceViewModel
 import org.linphone.activities.call.viewmodels.ControlsViewModel
 import org.linphone.activities.call.viewmodels.SharedCallViewModel
-import org.linphone.activities.main.MainActivity
 import org.linphone.activities.main.viewmodels.DialogViewModel
 import org.linphone.core.Call
 import org.linphone.core.tools.Log
@@ -41,8 +41,16 @@ class ControlsFragment : GenericFragment<CallControlsFragmentBinding>() {
 
     override fun getLayoutId(): Int = R.layout.call_controls_fragment
 
-    // We have to use lateinit here because we need to compute the screen width first
+    // We have to use late init here because we need to compute the screen width first
     private lateinit var numpadAnimator: ValueAnimator
+    private val proximitySensor by lazy {
+        val powerManager = requireActivity().getSystemService<PowerManager>() ?: return@lazy null
+        if (powerManager.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
+            powerManager.newWakeLock(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, CallActivity::class.java.simpleName).also {
+                it.setReferenceCounted(false)
+            }
+        } else null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,7 +60,7 @@ class ControlsFragment : GenericFragment<CallControlsFragmentBinding>() {
         sharedViewModel = requireActivity().run {
             ViewModelProvider(this).get(SharedCallViewModel::class.java)
         }
-
+        proximitySensor?.acquire(10 * 60 * 1000L /*10 minutes*/)
         callsViewModel = ViewModelProvider(this).get(CallsViewModel::class.java)
         binding.viewModel = callsViewModel
 
@@ -61,11 +69,15 @@ class ControlsFragment : GenericFragment<CallControlsFragmentBinding>() {
 
         conferenceViewModel = ViewModelProvider(this).get(ConferenceViewModel::class.java)
         binding.conferenceViewModel = conferenceViewModel
-
+        callsViewModel.callEndedEvent.observe(viewLifecycleOwner, {
+            it.consume {
+                proximitySensor?.release()
+            }
+        })
         callsViewModel.currentCallViewModel.observe(viewLifecycleOwner, {
             if (it != null) {
                 binding.activeCallTimer.base =
-                    SystemClock.elapsedRealtime() - (1000 * it.call.duration) // Linphone timestamps are in seconds
+                        SystemClock.elapsedRealtime() - (1000 * it.call.duration) // Linphone timestamps are in seconds
                 binding.activeCallTimer.start()
             }
         })
@@ -94,38 +106,6 @@ class ControlsFragment : GenericFragment<CallControlsFragmentBinding>() {
                         showCallVideoUpdateDialog(call)
                     }
                 }
-            }
-        })
-
-        controlsViewModel.chatClickedEvent.observe(viewLifecycleOwner, {
-            it.consume {
-                val intent = Intent()
-                intent.setClass(requireContext(), MainActivity::class.java)
-                intent.putExtra("Chat", true)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            }
-        })
-
-        controlsViewModel.addCallClickedEvent.observe(viewLifecycleOwner, {
-            it.consume {
-                val intent = Intent()
-                intent.setClass(requireContext(), MainActivity::class.java)
-                intent.putExtra("Dialer", true)
-                intent.putExtra("Transfer", false)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            }
-        })
-
-        controlsViewModel.transferCallClickedEvent.observe(viewLifecycleOwner, {
-            it.consume {
-                val intent = Intent()
-                intent.setClass(requireContext(), MainActivity::class.java)
-                intent.putExtra("Dialer", true)
-                intent.putExtra("Transfer", true)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
             }
         })
 
@@ -166,9 +146,9 @@ class ControlsFragment : GenericFragment<CallControlsFragmentBinding>() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+            requestCode: Int,
+            permissions: Array<out String>,
+            grantResults: IntArray
     ) {
         if (requestCode == 0) {
             for (i in permissions.indices) {
