@@ -10,7 +10,6 @@ import android.view.Display
 import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.navigation.ActivityNavigator
 import java.util.*
 import org.linphone.BaseApplication.Companion.coreContext
 import org.linphone.BaseApplication.Companion.corePreferences
@@ -87,7 +86,7 @@ abstract class GenericActivity : AppCompatActivity() {
 
     override fun finish() {
         super.finish()
-        ActivityNavigator.applyPopAnimationsToPendingTransition(this)
+//        ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 
     fun isTablet(): Boolean {

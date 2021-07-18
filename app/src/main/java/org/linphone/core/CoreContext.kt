@@ -17,7 +17,6 @@ import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
 import androidx.lifecycle.MutableLiveData
 import com.github.chrisbanes.photoview.BuildConfig.VERSION_NAME
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.*
 import org.linphone.BaseApplication.Companion.corePreferences
 import org.linphone.R
@@ -252,7 +251,7 @@ class CoreContext(val context: Context, coreConfig: Config) {
                 LogLevel.Fatal -> android.util.Log.wtf(domain, message)
                 else -> android.util.Log.d(domain, message)
             }
-            FirebaseCrashlytics.getInstance().log("[$domain] [${level.name}] $message")
+//            FirebaseCrashlytics.getInstance().log("[$domain] [${level.name}] $message")
         }
     }
     private val webService: WebService by lazy {

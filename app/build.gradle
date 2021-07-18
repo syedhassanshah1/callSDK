@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.library'
+//    id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'org.jlleitschuh.gradle.ktlint'
@@ -10,22 +11,6 @@ static def getPackageName() {
     return "org.linphone"
 }
 
-static def firebaseEnabled() {
-    File googleFile = new File('app/google-services.json')
-    return googleFile.exists()
-}
-
-def crashlyticsEnabled() {
-    File googleFile = new File('app/google-services.json')
-    File linphoneLibrary = new File(LinphoneSdkBuildDir + '/libs/')
-    File linphoneLibraryDebug = new File(LinphoneSdkBuildDir + '/libs-debug/')
-    return googleFile.exists() && linphoneLibrary.exists() && linphoneLibraryDebug.exists()
-}
-
-if (crashlyticsEnabled()) {
-    apply plugin: 'com.google.firebase.crashlytics'
-}
-
 android {
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
@@ -34,6 +19,7 @@ android {
         targetSdkVersion 30
         versionCode 4491
         versionName "${project.version}"
+//        applicationId "com.app.siptest"
     }
 
     // Required to be able to generate app bundle with native libraries symbols, see releaseAppBundle below
@@ -43,98 +29,6 @@ android {
     } else {
         ndkPath ndkHome
     }
-/*
-    libraryVariants.all { variant ->
-        variant.outputs.all {
-//            outputFileName = "linphone-android-${variant.buildType.name}-${project.version}.apk"
-        }
-
-        // See https://developer.android.com/studio/releases/gradle-plugin#3-6-0-behavior for why extractNativeLibs is set to true in debug flavor
-        if (variant.buildType.name == "release" || variant.buildType.name == "releaseAppBundle") {
-            variant.getMergedFlavor().manifestPlaceholders = [linphone_address_mime_type: "vnd.android.cursor.item/vnd." + getPackageName() + ".provider.sip_address",
-                                                            linphone_file_provider: getPackageName() + ".fileprovider",
-                                                            appLabel: "@string/app_name",
-                                                            extractNativeLibs: "false"]
-        } else {
-            variant.getMergedFlavor().manifestPlaceholders = [linphone_address_mime_type: "vnd.android.cursor.item/vnd." + getPackageName() + ".provider.sip_address",
-                                                            linphone_file_provider: getPackageName() + ".debug.fileprovider",
-                                                            appLabel: "@string/app_name_debug",
-                                                            extractNativeLibs: "true"]
-        }
-    }
-
-    def keystorePropertiesFile = rootProject.file("keystore.properties")
-    def keystoreProperties = new Properties()
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
-    signingConfigs {
-        release {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-        }
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled true
-            signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            resValue "string", "sync_account_type", getPackageName() + ".sync"
-            resValue "string", "file_provider", getPackageName() + ".fileprovider"
-            resValue "string", "linphone_address_mime_type", "vnd.android.cursor.item/vnd." + getPackageName() + ".provider.sip_address"
-
-            if (!firebaseEnabled()) {
-                resValue "string", "gcm_defaultSenderId", "none"
-            }
-
-            resValue "bool", "crashlytics_enabled", "false"
-        }
-
-        releaseAppBundle {
-            initWith release
-//            ndk.debugSymbolLevel = 'FULL'
-
-            if (crashlyticsEnabled()) {
-                resValue "bool", "crashlytics_enabled", "true"
-
-                firebaseCrashlytics {
-                    nativeSymbolUploadEnabled true
-                    strippedNativeLibsDir file(LinphoneSdkBuildDir + '/libs/').toString()
-                    unstrippedNativeLibsDir file(LinphoneSdkBuildDir + '/libs-debug/').toString()
-                }
-            } else {
-                resValue "bool", "crashlytics_enabled", "false"
-            }
-        }
-
-        debug {
-            debuggable true
-            jniDebuggable true
-
-            resValue "string", "sync_account_type", getPackageName() + ".sync"
-            resValue "string", "file_provider", getPackageName() + ".debug.fileprovider"
-            resValue "string", "linphone_address_mime_type", "vnd.android.cursor.item/vnd." + getPackageName() + ".provider.sip_address"
-
-            if (!firebaseEnabled()) {
-                resValue "string", "gcm_defaultSenderId", "none"
-            }
-
-            if (crashlyticsEnabled()) {
-                resValue "bool", "crashlytics_enabled", "true"
-
-                firebaseCrashlytics {
-                    nativeSymbolUploadEnabled true
-                    strippedNativeLibsDir file(LinphoneSdkBuildDir + '/libs/').toString()
-                    unstrippedNativeLibsDir file(LinphoneSdkBuildDir + '/libs-debug/').toString()
-                }
-            } else {
-                resValue "bool", "crashlytics_enabled", "false"
-            }
-        }
-    }*/
 
     buildFeatures {
         dataBinding = true
@@ -202,27 +96,12 @@ dependencies {
 
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
-    implementation platform('com.google.firebase:firebase-bom:26.4.0')
-    if (crashlyticsEnabled()) {
-        implementation 'com.google.firebase:firebase-crashlytics-ndk'
-    } else {
-        compileOnly 'com.google.firebase:firebase-crashlytics-ndk'
-    }
-    if (firebaseEnabled()) {
-        implementation 'com.google.firebase:firebase-messaging'
-    }
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
     implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.2"
     implementation 'org.linphone:linphone-sdk-android:5.0.1'
 
-    // Only enable leak canary prior to release
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
-}
-
-if (firebaseEnabled()) {
-    apply plugin: 'com.google.gms.google-services'
 }
 
 task generateContactsXml(type: Copy) {
@@ -245,12 +124,3 @@ ktlint {
 
 project.tasks['preBuild'].dependsOn 'ktlintFormat'
 
-if (crashlyticsEnabled()) {
-    afterEvaluate {
-        assembleDebug.finalizedBy(uploadCrashlyticsSymbolFileDebug)
-        packageDebugBundle.finalizedBy(uploadCrashlyticsSymbolFileDebug)
-
-        assembleReleaseAppBundle.finalizedBy(uploadCrashlyticsSymbolFileReleaseAppBundle)
-        packageReleaseAppBundleBundle.finalizedBy(uploadCrashlyticsSymbolFileReleaseAppBundle)
-    }
-}
