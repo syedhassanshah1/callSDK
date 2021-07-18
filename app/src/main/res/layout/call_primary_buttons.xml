@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="org.linphone.activities.call.viewmodels.ControlsViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/call_button_size"
+            android:layout_weight="0.25"
+            android:visibility="gone"
+            android:background="@drawable/button_background_dark"
+            android:contentDescription="@string/content_description_show_numpad"
+            android:onClick="@{() -> viewModel.toggleNumpadVisibility()}"
+            android:padding="15dp"
+            android:selected="@{viewModel.numpadVisibility}"
+            android:src="@drawable/call_numpad" />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/call_button_size"
+            android:layout_weight="0.5"
+            android:background="@drawable/call_hangup_background"
+            android:contentDescription="@string/content_description_terminate_call"
+            android:onClick="@{() -> viewModel.terminateCall()}"
+            android:padding="12dp"
+            android:src="@drawable/call_hangup" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="@dimen/call_button_size"
+                android:layout_weight="0.25"
+                android:background="@drawable/footer_button"
+                android:onClick="@{() -> viewModel.onChatClicked()}"
+                android:visibility="@{viewModel.chatAllowed ? View.VISIBLE : View.GONE}">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/button_background_dark"
+                    android:contentDescription="@string/content_description_go_to_chat"
+                    android:padding="15dp"
+                    android:src="@drawable/footer_chat" />
+
+                <TextView
+                    style="@style/unread_count_font"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="25dp"
+                    android:background="@drawable/unread_message_count_bg"
+                    android:gravity="center"
+                    android:text="@{String.valueOf(viewModel.unreadMessagesCount)}"
+                    android:translationY="@{viewModel.chatUnreadCountTranslateY}"
+                    android:visibility="@{viewModel.unreadMessagesCount == 0 ? View.GONE : View.VISIBLE}" />
+
+            </RelativeLayout>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</layout>
