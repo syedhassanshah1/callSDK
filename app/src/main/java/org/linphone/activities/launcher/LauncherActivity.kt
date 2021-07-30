@@ -1,16 +1,15 @@
 package org.linphone.activities.launcher
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import com.callsdk.builder.CallSDKBuilder
 import org.linphone.BaseApplication.Companion.coreContext
 import org.linphone.BaseApplication.Companion.corePreferences
 import org.linphone.R
 import org.linphone.activities.GenericActivity
 import org.linphone.activities.launcher.dataModels.CallParametersModel
-import com.callsdk.builder.CallSDKBuilder
 import org.linphone.activities.main.viewmodels.SharedMainViewModel
 import org.linphone.core.*
 import org.linphone.core.tools.Log
@@ -36,7 +35,7 @@ class LauncherActivity : GenericActivity() {
                     if (!callParams?.extensionNoTo.isNullOrEmpty()) {
                         coreContext.handler.postDelayed({
                             callParams?.extensionNoTo?.let {
-                                coreContext.startCall(it,callParams?.extensionNoFrom ?: "")
+                                coreContext.startCall(it, callParams?.extensionNoFrom ?: "")
                                 finishApp()
                             }
                         }, 500)
@@ -98,10 +97,10 @@ class LauncherActivity : GenericActivity() {
             waitForServerAnswer.value = true
             coreContext.core.addListener(coreListener)
 
-            accountCreator.username ="1090" /*callParams?.authorizationUsername*/
-            accountCreator.password = "ab0000"/*callParams?.authorizationPassword*/
+            accountCreator.username = callParams?.authorizationUsername
+            accountCreator.password = callParams?.authorizationPassword
 //            accountCreator.domain = "${callParams?.sIPServerURL}:${callParams?.sIPServerPort}"
-            accountCreator.domain = "${callParams?.sIPServerURL}:7060"
+            accountCreator.domain = "${callParams?.sIPServerURL}:8061"
             accountCreator.displayName = "test"
             accountCreator.transport = TransportType.Tcp
 
